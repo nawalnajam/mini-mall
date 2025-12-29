@@ -2,16 +2,24 @@
 
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function ReviewPage() {
   const { cart, clearCart } = useCart();
   const router = useRouter();
 
-  const address = JSON.parse(
-    localStorage.getItem("checkoutAddress") || "{}"
-  );
+  const [address, setAddress] = useState<any>({});
 
-  const total = cart.reduce(
+  // ✅ localStorage ONLY in useEffect
+  useEffect(() => {
+    const storedAddress = localStorage.getItem("checkoutAddress");
+    if (storedAddress) {
+      setAddress(JSON.parse(storedAddress));
+    }
+  }, []);
+
+  // ✅ safe reduce
+  const total = (cart || []).reduce(
     (sum, item) => sum + item.productId.price * item.quantity,
     0
   );
