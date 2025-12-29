@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 
 export default function CartPage() {
-  const { cart, removeFromCart, updateCart } = useCart();
+  const { cart, removeFromCart} = useCart();
 
   if (!cart || cart.length === 0) {
     return (
@@ -43,32 +43,12 @@ export default function CartPage() {
                   Rs {item.productId.price}
                 </p>
 
-                <div className="flex items-center gap-3 mt-3">
-                  <button
-                    onClick={() =>
-                      updateCart(
-                        item.productId._id,
-                        item.quantity - 1
-                      )
-                    }
-                    className="px-3 py-1 border rounded"
-                  >
-                    −
-                  </button>
+              
 
                   <span>{item.quantity}</span>
 
-                  <button
-                    onClick={() =>
-                      updateCart(
-                        item.productId._id,
-                        item.quantity + 1
-                      )
-                    }
-                    className="px-3 py-1 border rounded"
-                  >
-                    +
-                  </button>
+                  
+              
 
                   <button
                     onClick={() =>
@@ -80,7 +60,7 @@ export default function CartPage() {
                   </button>
                 </div>
               </div>
-            </div>
+            
           ))}
         </div>
 
