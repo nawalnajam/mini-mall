@@ -1,10 +1,12 @@
-// models/Category.js
+// models/Product.js
 import mongoose from "mongoose";
 
-const CategorySchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true },
+const ProductSchema = new mongoose.Schema({
+  name: String,
+  price: Number,
+  image: String,
+  category: String,
 });
 
-const Category = mongoose.models.Category || mongoose.model("Category", CategorySchema);
-
-export default Category;
+const Product = mongoose.models.Product || mongoose.model("Product", ProductSchema);
+export default Product;
