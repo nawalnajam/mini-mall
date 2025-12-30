@@ -1,4 +1,6 @@
 import ProductCard from "@/components/product/ProductCard";
+import dbConnect from "@/lib/db";
+import mongoose from "mongoose";
 
 interface Product {
   _id: string;
@@ -14,52 +16,57 @@ interface CategoryPageProps {
   };
 }
 
+// Define Mongoose schema (if not defined elsewhere)
+const ProductSchema = new mongoose.Schema({
+  name: String,
+  price: Number,
+  image: String,
+  category: String,
+});
+
+// Avoid recompiling model
+const ProductModel = mongoose.models.Product || mongoose.model("Product", ProductSchema);
+
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { category } = params;
 
-  const res = await fetch("/api/products", {
-    cache: "no-store",
-  });
+  try {
+    await dbConnect();
 
-  if (!res.ok) {
+    const products: Product[] = await ProductModel.find({
+      category: { $regex: new RegExp(`^${category}$`, "i") },
+    }).lean();
+
+    if (!products || products.length === 0) {
+      return (
+        <div className="p-8 text-center text-gray-500">
+          No products found in <b>{category}</b>
+        </div>
+      );
+    }
+
+    return (
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <h1 className="text-3xl font-bold capitalize mb-6">{category}</h1>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+          {products.map((product) => (
+            <ProductCard
+              key={product._id.toString()}
+              _id={product._id.toString()}
+              name={product.name}
+              price={product.price}
+              image={product.image}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  } catch (error) {
+    console.error(error);
     return (
       <div className="p-8 text-center text-red-500">
         Failed to load products
       </div>
     );
   }
-
-  const products: Product[] = await res.json();
-
-  const filtered = products.filter(
-    (p) => p.category.toLowerCase() === category.toLowerCase()
-  );
-
-  if (filtered.length === 0) {
-    return (
-      <div className="p-8 text-center text-gray-500">
-        No products found in <b>{category}</b>
-      </div>
-    );
-  }
-
-  return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
-      <h1 className="text-3xl font-bold capitalize mb-6">
-        {category}
-      </h1>
-
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-        {filtered.map((product) => (
-          <ProductCard
-            key={product._id}
-            _id={product._id}
-            name={product.name}
-            price={product.price}
-            image={product.image}
-          />
-        ))}
-      </div>
-    </div>
-  );
 }

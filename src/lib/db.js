@@ -1,3 +1,4 @@
+// lib/db.js
 import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -19,12 +20,14 @@ async function dbConnect() {
 
   if (!cached.promise) {
     cached.promise = mongoose.connect(MONGODB_URI, {
-      dbName: "test", // 🔴 CONFIRM THIS NAME
+      dbName: "test", // 🔴 Change this to your DB name
+    }).then((mongoose) => {
+      console.log("✅ MongoDB connected");
+      return mongoose;
     });
   }
 
   cached.conn = await cached.promise;
-  console.log("✅ MongoDB connected");
   return cached.conn;
 }
 
