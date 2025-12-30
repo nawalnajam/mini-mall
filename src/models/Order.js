@@ -1,3 +1,4 @@
+// models/Order.js
 import mongoose from "mongoose";
 
 const OrderSchema = new mongoose.Schema(
@@ -7,29 +8,25 @@ const OrderSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-
     items: [
       {
         productId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Product",
         },
-        quantity: Number,
-        price: Number,
+        quantity: { type: Number, default: 1 },
+        price: { type: Number, required: true },
       },
     ],
-
-    address: Object,
-    paymentMethod: String,
-    total: Number,
-
-    status: {
-      type: String,
-      default: "Placed",
-    },
+    address: { type: Object, required: true },
+    paymentMethod: { type: String, required: true },
+    total: { type: Number, required: true },
+    status: { type: String, default: "Placed" },
   },
   { timestamps: true }
 );
 
-export default mongoose.models.Order ||
-  mongoose.model("Order", OrderSchema);
+// ✅ Avoid model recompilation on hot reload
+const Order = mongoose.models.Order || mongoose.model("Order", OrderSchema);
+
+export default Order;

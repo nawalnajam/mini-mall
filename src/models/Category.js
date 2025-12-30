@@ -3,6 +3,9 @@ import mongoose from "mongoose";
 
 const CategorySchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true },
-}, { timestamps: true });
+});
 
-export default mongoose.models.Category || mongoose.model("Category", CategorySchema);
+// Avoid recompiling the model on hot reload
+const Category = mongoose.models.Category || mongoose.model("Category", CategorySchema);
+
+export default Category;
