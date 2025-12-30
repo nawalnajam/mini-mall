@@ -16,7 +16,7 @@ interface CategoryPageProps {
   };
 }
 
-// Define Mongoose schema (if not defined elsewhere)
+// Mongoose schema
 const ProductSchema = new mongoose.Schema({
   name: String,
   price: Number,
@@ -26,6 +26,18 @@ const ProductSchema = new mongoose.Schema({
 
 // Avoid recompiling model
 const ProductModel = mongoose.models.Product || mongoose.model("Product", ProductSchema);
+
+export async function generateStaticParams() {
+  await dbConnect();
+
+  // Get all unique categories from DB
+  const categories: string[] = await ProductModel.distinct("category");
+
+  // Return lowercase for URL consistency
+  return categories.map((cat) => ({
+    category: cat.toLowerCase(),
+  }));
+}
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { category } = params;
