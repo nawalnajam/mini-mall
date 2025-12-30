@@ -9,20 +9,18 @@ interface Product {
 }
 
 interface CategoryPageProps {
-  params: Promise<{
+  params: {
     category: string;
-  }>;
+  };
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
-  // ✅ Next.js 16 fix
-  const { category } = await params;
+  const { category } = params;
 
-  const res = await fetch("http://localhost:3000/api/products", {
+  const res = await fetch("/api/products", {
     cache: "no-store",
   });
 
-  // ✅ SAFETY CHECK (bohat zaroori)
   if (!res.ok) {
     return (
       <div className="p-8 text-center text-red-500">
@@ -51,8 +49,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         {category}
       </h1>
 
-  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
         {filtered.map((product) => (
           <ProductCard
             key={product._id}
