@@ -1,81 +1,53 @@
 export const dynamic = "force-dynamic";
-import ProductCard from "@/components/product/ProductCard";
+export const revalidate = 0;
+
 import dbConnect from "@/lib/db";
-import mongoose from "mongoose";
+import Product from "@/models/Product";
+import ProductCard from "@/components/product/ProductCard";
 
-interface Product {
-  _id: string;
-  name: string;
-  price: number;
-  image: string;
-  category: string;
-}
-
-interface CategoryPageProps {
+interface Props {
   params: {
     category: string;
   };
 }
 
-// Mongoose schema
-const ProductSchema = new mongoose.Schema({
-  name: String,
-  price: Number,
-  image: String,
-  category: String,
-});
-
-// Avoid recompiling model
-const ProductModel = mongoose.models.Product || mongoose.model("Product", ProductSchema);
-
-export async function generateStaticParams() {
-  await dbConnect();
-
-  // Get all unique categories from DB
-  const categories: string[] = await ProductModel.distinct("category");
-
-  // Return lowercase for URL consistency
-  return categories.map((cat) => ({
-    category: cat.toLowerCase(),
-  }));
-}
-
-export default async function CategoryPage({ params }: CategoryPageProps) {
-  const { category } = params;
-
+export default async function CategoryPage({ params }: Props) {
   try {
     await dbConnect();
 
-    const products: Product[] = await ProductModel.find({
-      category: { $regex: new RegExp(`^${category}$`, "i") },
+    const products = await Product.find({
+      category: { $regex: `^${params.category}$`, $options: "i" },
     }).lean();
 
-    if (!products || products.length === 0) {
+    if (!products.length) {
       return (
         <div className="p-8 text-center text-gray-500">
-          No products found in <b>{category}</b>
+          No products found in <b>{params.category}</b>
         </div>
       );
     }
 
     return (
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <h1 className="text-3xl font-bold capitalize mb-6">{category}</h1>
+        <h1 className="text-3xl font-bold capitalize mb-6">
+          {params.category}
+        </h1>
+
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-          {products.map((product) => (
+          {products.map((p: any) => (
             <ProductCard
-              key={product._id.toString()}
-              _id={product._id.toString()}
-              name={product.name}
-              price={product.price}
-              image={product.image}
+              key={p._id.toString()}
+              _id={p._id.toString()}
+              name={p.name}
+              price={p.price}
+              image={p.image}
             />
           ))}
         </div>
       </div>
     );
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error("CATEGORY PAGE ERROR:", err);
     return (
       <div className="p-8 text-center text-red-500">
         Failed to load products
