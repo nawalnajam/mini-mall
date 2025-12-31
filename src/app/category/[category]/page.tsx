@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import ProductCard from "@/components/product/ProductCard";
 import dbConnect from "@/lib/db";
 import mongoose from "mongoose";
