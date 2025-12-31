@@ -11,7 +11,7 @@ async function dbConnect() {
 
   if (!cached.promise) {
     cached.promise = mongoose.connect(MONGODB_URI, {
-      dbName: "test", // replace with your DB name
+      dbName: "minimall", // replace with your DB name
     }).then((mongoose) => mongoose);
   }
 

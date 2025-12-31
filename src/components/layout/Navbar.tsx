@@ -7,6 +7,7 @@ import { useCart } from "@/context/CartContext";
 import { useEffect, useState } from "react";
 
 interface Category {
+  _id: string;
   name: string;
 }
 
@@ -19,17 +20,19 @@ export default function Navbar() {
     : 0;
 
   useEffect(() => {
-    // Fetch categories from API
-    fetch("/api/categories") // Create an API endpoint to return unique categories
+    fetch("/api/categories")
       .then((res) => res.json())
-      .then((data) => setCategories(data))
-      .catch((err) => console.error(err));
+      .then((data) =>
+        setCategories(
+          data.map((c: any) => (typeof c === "string" ? { _id: c, name: c } : c))
+        )
+      )
+      .catch((err) => console.error("Failed to fetch categories:", err));
   }, []);
 
   return (
     <nav className="bg-white shadow sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        {/* LOGO + NAME */}
         <Link href="/" className="flex items-center gap-2">
           <Image
             src="/images/logo2.jpg"
@@ -42,20 +45,22 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* NAV LINKS */}
         <div className="hidden md:flex gap-6 font-medium">
-          {categories.map((cat) => (
-            <Link
-              href={`/category/${cat.name.toLowerCase()}`}
-              key={cat.name}
-              className="hover:text-purple-600 capitalize"
-            >
-              {cat.name}
-            </Link>
-          ))}
+          {categories.length === 0 ? (
+            <span className="text-gray-400">Loading...</span>
+          ) : (
+            categories.map((cat) => (
+              <Link
+                href={`/category/${cat.name.toLowerCase()}`}
+                key={cat._id}
+                className="hover:text-purple-600 capitalize"
+              >
+                {cat.name}
+              </Link>
+            ))
+          )}
         </div>
 
-        {/* CART & LOGIN */}
         <div className="flex items-center gap-5">
           <Link href="/cart" className="relative">
             <ShoppingCart className="w-6 h-6 hover:text-purple-600" />
