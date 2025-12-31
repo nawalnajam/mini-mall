@@ -45,7 +45,7 @@ export default function Navbar() {
           </span>
         </Link>
 
-        <div className="hidden md:flex gap-6 font-medium">
+        <div className="flex gap-6 font-medium">
           {categories.length === 0 ? (
             <span className="text-gray-400">Loading...</span>
           ) : (
