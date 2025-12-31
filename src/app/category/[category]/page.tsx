@@ -6,23 +6,25 @@ import Product from "@/models/Product";
 import ProductCard from "@/components/product/ProductCard";
 
 interface Props {
-  params: {
+  params: Promise<{
     category: string;
-  };
+  }>;
 }
 
 export default async function CategoryPage({ params }: Props) {
+  const { category } = await params; // ✅ VERY IMPORTANT
+
   try {
     await dbConnect();
 
     const products = await Product.find({
-      category: { $regex: `^${params.category}$`, $options: "i" },
+      category: { $regex: `^${category}$`, $options: "i" },
     }).lean();
 
     if (!products.length) {
       return (
         <div className="p-8 text-center text-gray-500">
-          No products found in <b>{params.category}</b>
+          No products found in <b>{category}</b>
         </div>
       );
     }
@@ -30,7 +32,7 @@ export default async function CategoryPage({ params }: Props) {
     return (
       <div className="max-w-7xl mx-auto px-6 py-8">
         <h1 className="text-3xl font-bold capitalize mb-6">
-          {params.category}
+          {category}
         </h1>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
